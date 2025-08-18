@@ -1,5 +1,6 @@
 import "./login.css";
 import Logo from "../../assets/logo.svg";
+import { Link } from "react-router-dom";
 export default function Login() {
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -57,9 +58,9 @@ export default function Login() {
         <div className="bg-white p-6 border border-gray-300 text-center ">
           <p className="text-sm">
             Don't have an account?{" "}
-            <a href="./register.html" className="text-blue-500 font-semibold">
+            <Link to={"/register"} className="text-blue-500 font-semibold">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
