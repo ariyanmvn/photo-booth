@@ -5,12 +5,15 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../Context/authcontext";
+import { imageUpload } from "../../api/utils";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 export default function Register() {
   const { createProfile, updateUserProfile } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const axiosPublic = useAxiosPublic();
   const {
     register,
     handleSubmit,
@@ -18,26 +21,44 @@ export default function Register() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    const { fullName, email, password, cpassword } = data;
+    const { fullName, email, password, cpassword, profilePic } = data;
 
     try {
       if (password !== cpassword) {
         return toast.error("Password didn't match!");
       }
 
-      const res = await createProfile(email, password);
+      await createProfile(email, password);
 
-      if (res?.user) {
-        await updateUserProfile({
-          displayName: fullName,
-          photoURL: "",
-        });
+      let photoURL;
+      try {
+        photoURL = await imageUpload(profilePic[0]);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error("Image upload failed.");
+        return;
       }
+
+      await updateUserProfile({
+        displayName: fullName,
+        photoURL,
+      });
+
+      const data = {
+        email,
+        userName: fullName,
+        profilePic: photoURL,
+        bio: "",
+        createdAt: Date.now(),
+      };
+
+      const response = await axiosPublic.post("/users", data);
+      console.log(response.data);
       toast.success("Successfully registered");
       navigate("/");
     } catch (error) {
       console.error("Registration error:", error);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(error.message);
     }
   };
 
@@ -145,6 +166,26 @@ export default function Register() {
                 >
                   {showConfirmPassword ? "Hide" : "Show"}
                 </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.cpassword.message}
+                </p>
+              )}
+            </div>
+
+            <div className="mb-3">
+              <div className="relative">
+                <input
+                  type="file"
+                  {...register("profilePic", {
+                    required: "Profile pic is required",
+                  })}
+                  className="form-input"
+                  placeholder="Upload Image"
+                  accept="image/*"
+                  required
+                />
               </div>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">

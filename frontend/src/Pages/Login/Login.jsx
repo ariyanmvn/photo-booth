@@ -1,16 +1,19 @@
 import "./login.css";
 import Logo from "../../assets/logo.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../Context/authcontext";
 import toast from "react-hot-toast";
-import LoadingSpinner from "../../Components/LoadingSpinner";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const { loading, userLogin, googleLogin } = useContext(AuthContext);
+  const { userLogin, googleLogin } = useContext(AuthContext);
+
+  const axiosPublic = useAxiosPublic();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     register,
@@ -22,27 +25,37 @@ export default function Login() {
     const { email, password } = data;
     try {
       const res = await userLogin(email, password);
-      if (res.user.email) {
-        toast.success("Login Success");
-        navigate("/");
-      }
+      console.log(res);
+
+      toast.success("successfully logged in");
+      navigate(location?.state ? location.state : "/");
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  const handleGoogle = () => {
-    googleLogin()
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const handleGoogle = async () => {
+    try {
+      const res = await googleLogin();
+      const email = res.email;
+      const name = res.displayName;
+      const photoURL = res.photoURL;
+      const user = {
+        email,
+        userName: name,
+        profilePic: photoURL,
+        bio: "",
+        createdAt: Date.now(),
+      };
+      const response = await axiosPublic.post("/users", user);
+      console.log(response.data);
+      navigate(location?.state ? location.state : "/");
+      toast.success("Login Successful");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
   };
-  if (loading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">

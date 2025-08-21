@@ -1,8 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainRoute from "../Components/MainRoute";
-import App from "../App";
 import Login from "../Pages/Login/Login";
 import Register from "../Pages/Register/Register";
+import Hero from "../Components/Hero";
+import Notification from "../Pages/Notifications/Notification";
+import Profile from "../Pages/Profile/Profile";
+import CreatePost from "../Pages/CreatePost/CreatePost";
+import EditProfile from "../Pages/EditProfile/EditProfile";
+import PostDetails from "../Components/PostDetails";
+import PrivateRoute from "./PrivateRoute";
 
 export const router = createBrowserRouter([
   {
@@ -12,15 +18,47 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <App />,
+        element: <Hero />,
       },
       {
-        path: "/about",
-        element: <h1>About page</h1>,
+        path: "/notifications",
+        element: (
+          <PrivateRoute>
+            <Notification />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "/contact",
-        element: <h1>contact</h1>,
+        path: "/profile",
+        element: (
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/create-posts",
+        element: (
+          <PrivateRoute>
+            <CreatePost />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/edit-profile",
+        element: (
+          <PrivateRoute>
+            <EditProfile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/post-details",
+        element: (
+          <PrivateRoute>
+            <PostDetails />
+          </PrivateRoute>
+        ),
       },
     ],
   },
