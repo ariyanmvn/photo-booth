@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../Context/authcontext";
 import toast from "react-hot-toast";
+import useGetSingleUser from "../Hooks/useGetSingleUser";
 export default function SideBar() {
   const { user: authUser, logOut } = useContext(AuthContext);
+  const { user: dbUser } = useGetSingleUser(authUser?.email);
 
   const handleLogout = async () => {
     try {
@@ -116,17 +118,17 @@ export default function SideBar() {
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-300">
                 <img
-                  src={authUser?.photoURL ||Avatar}
+                  src={dbUser?.profilePic || ""}
                   alt="User avatar"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="ml-2">
                 <span className="font-semibold text-sm">
-                  {authUser?.displayName}
+                  {dbUser?.userName}
                 </span>
                 <p className="text-xs text-gray-500  leading-0">
-                  {"@" + authUser.email.split("@")[0]}
+                  {"@" + dbUser.email.split("@")[0]}
                 </p>
               </div>
             </div>

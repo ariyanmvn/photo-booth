@@ -38,19 +38,34 @@ async function run() {
       res.send(result);
     });
 
-
     app.get("/users", async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     });
 
     app.get("/users/:email", async (req, res) => {
-      const email=req.params.email;
-      const query={email}
+      const email = req.params.email;
+      const query = { email };
       const result = await usersCollection.findOne(query);
       res.send(result);
     });
 
+    app.put("/users/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const updatedData = req.body;
+        const filer = { email };
+        const updatedDoc = { $set: updatedData };
+        const result = await usersCollection.updateOne(filer, updatedDoc);
+        if (result.matchedCount === 0) {
+          return res.status(404).send({ message: "User not found" });
+        }
+        res.send({ message: "user updated successfully" });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: "Failed to update user" });
+      }
+    });
   } catch (err) {
     console.error("error connecting to mongodb", err.message);
   }
