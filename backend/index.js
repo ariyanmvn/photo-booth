@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -23,6 +23,7 @@ async function run() {
   try {
     const db = client.db("photo-booth");
     const usersCollection = db.collection("users");
+    const postsCollection = db.collection("posts");
 
     app.post("/users", async (req, res) => {
       const user = req.body;
@@ -38,8 +39,37 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/posts", async (req, res) => {
+      const data = req.body;
+      const result = await postsCollection.insertOne(data);
+      res.send(result);
+    });
+
+    //user route
     app.get("/users", async (req, res) => {
       const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+
+    //posts route
+    app.get("/posts", async (req, res) => {
+      const result = await postsCollection.find().toArray();
+      res.send(result);
+    });
+
+    //post details
+    app.get("/posts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await postsCollection.findOne(query);
+      res.send(result);
+    });
+
+    //my-posts
+    app.get("/my-posts/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { "author.email": email };
+      const result = await postsCollection.find(query).toArray();
       res.send(result);
     });
 

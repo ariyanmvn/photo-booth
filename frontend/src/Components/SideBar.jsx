@@ -1,5 +1,4 @@
 import Logo from "../assets/logo-2.svg";
-import Avatar from "../assets/avatar.jpg";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../Context/authcontext";
@@ -118,7 +117,7 @@ export default function SideBar() {
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-300">
                 <img
-                  src={dbUser?.profilePic || ""}
+                  src={dbUser?.profilePic || null}
                   alt="User avatar"
                   className="w-full h-full object-cover"
                 />
@@ -128,7 +127,7 @@ export default function SideBar() {
                   {dbUser?.userName}
                 </span>
                 <p className="text-xs text-gray-500  leading-0">
-                  {"@" + dbUser.email.split("@")[0]}
+                  {"@" + dbUser?.email.split("@")[0]}
                 </p>
               </div>
             </div>

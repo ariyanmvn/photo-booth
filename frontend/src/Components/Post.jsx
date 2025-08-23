@@ -3,32 +3,32 @@ import User2 from "../assets/users/user-2.png";
 import User3 from "../assets/users/user-3.png";
 import PostImage from "../assets/articles/post-1.jpg";
 import { Link } from "react-router-dom";
-export default function Post() {
+export default function Post({ post }) {
   return (
     <article className="border-b pb-4 mb-4 max-w-[560px] mx-auto border rounded-md">
       <div className="flex items-center p-3">
-        <a
-          href="./profile.html"
+        <Link
+          to={"/profile"}
           className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs"
         >
           <img
-            src={User3}
+            src={post.author.profilePic}
             alt="User avatar"
             className="w-full h-full object-cover"
           />
-        </a>
+        </Link>
         <div className="ml-2">
-          <a href="./profile.html" className="font-semibold text-sm">
-            Sumit Saha
-          </a>
+          <Link to={"/profile"} className="font-semibold text-sm">
+            {post.author.userName}
+          </Link>
           <span className="text-gray-500 text-xs"> • 6m</span>
         </div>
       </div>
 
       <div className="relative">
-        <Link to="/post-details">
+        <Link to={`/post-details/${post._id}`}>
           <img
-            src={PostImage}
+            src={post.image}
             alt="Post image"
             className="w-full object-cover max-h-[1000px]"
           />
@@ -115,10 +115,15 @@ export default function Post() {
 
       <div className="px-3 mt-2">
         <p className="text-sm">
-          <span className="font-semibold">Reactive Accelerator</span>
+          <span className="font-semibold">{post.caption}</span>
           <span className="caption-text"> #AD</span>
           <span className="text-gray-500">... </span>
-          <button className="text-gray-500 text-sm">more</button>
+          <Link
+            to={`/post-details/${post._id}`}
+            className="text-gray-500 text-sm"
+          >
+            more
+          </Link>
         </p>
       </div>
 

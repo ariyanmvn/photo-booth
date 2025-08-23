@@ -9,10 +9,37 @@ import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../Context/authcontext";
 import useGetSingleUser from "../../Hooks/useGetSingleUser";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "../../Components/LoadingSpinner";
 
 export default function Profile() {
   const { user: authUser } = useContext(AuthContext);
   const { user: dbUser } = useGetSingleUser(authUser?.email);
+
+  const axiosPublic = useAxiosPublic();
+  const {
+    data: posts = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["posts"], // unique key for caching
+    queryFn: async () => {
+      const res = await axiosPublic.get(`/my-posts/${dbUser?.email}`);
+      return res.data;
+    },
+  });
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  if (error) {
+    return (
+      <div className="text-red-500 text-3xl font-bold text-center">
+        {error.message}
+      </div>
+    );
+  }
 
   return (
     <div class="main-container">
@@ -45,7 +72,7 @@ export default function Profile() {
 
             <div class="flex justify-center sm:justify-start space-x-8 mb-4 mt-2">
               <div>
-                <span class="font-semibold">53</span> posts
+                <span class="font-semibold">{posts.length}</span> posts
               </div>
             </div>
 
@@ -81,41 +108,21 @@ export default function Profile() {
         <section>
           <h3 class="font-semibold text-lg mb-4">Posts</h3>
           <div class="grid grid-cols-3 gap-1">
-            <a href="./post-details.html">
-              <div class="relative">
-                <img src={Post1} alt="Post" class="w-full grid-image" />
-              </div>
-            </a>
-
-            <a href="./post-details.html">
-              <div class="relative">
-                <img src={Post2} alt="Post" class="w-full grid-image" />
-              </div>
-            </a>
-
-            <a href="./post-details.html">
-              <div class="relative">
-                <img src={Post3} alt="Post" class="w-full grid-image" />
-              </div>
-            </a>
-
-            <a href="./post-details.html">
-              <div class="relative">
-                <img src={Post4} alt="Post" class="w-full grid-image" />
-              </div>
-            </a>
-
-            <a href="./post-details.html">
-              <div class="relative">
-                <img src={Post5} alt="Post" class="w-full grid-image" />
-              </div>
-            </a>
-
-            <a href="./post-details.html">
-              <div class="relative">
-                <img src={Post6} alt="Post" class="w-full grid-image" />
-              </div>
-            </a>
+            {posts.length > 0 ? (
+              posts.map((post) => (
+                <Link key={post._id} to={`/post-details/${post._id}`}>
+                  <div class="relative">
+                    <img
+                      src={post?.image}
+                      alt="Post"
+                      class="w-full grid-image"
+                    />
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <h1 className="text-3xl text-gray-600 text-center">No Posts.</h1>
+            )}
           </div>
         </section>
       </div>

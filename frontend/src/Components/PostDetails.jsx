@@ -7,13 +7,39 @@ import Post6 from "../assets/articles/post-6.jpg";
 import Post7 from "../assets/articles/post-7.jpg";
 import Authorimage from "../assets/articles/author-1.svg";
 import User1 from "../assets/users/user-1.png";
+import { Link, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosPublic from "../Hooks/useAxiosPublic";
 export default function PostDetails() {
+  const { id } = useParams();
+
+  const axiosPublic = useAxiosPublic();
+  const { data: post = {} } = useQuery({
+    queryKey: ["post", id],
+    queryFn: async () => {
+      const res = await axiosPublic.get(`/posts/${id}`);
+      return res.data;
+    },
+  });
+
+  const { data: posts = {} } = useQuery({
+    queryKey: ["post"],
+    queryFn: async () => {
+      const res = await axiosPublic.get(`/my-posts/${post.author.email}`);
+      return res.data;
+    },
+  });
+
   return (
     <div className="max-w-6xl w-full py-10 ml-[var(--sidebar-width)] px-4">
       <div className="bg-white border rounded-sm overflow-hidden mb-8 mx-auto max-w-5xl">
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-1/2 bg-black flex items-center">
-            <img src={Post1} alt="Post image" className="w-full post-image" />
+            <img
+              src={post?.image}
+              alt="Post image"
+              className="w-full post-image"
+            />
           </div>
 
           <div className="w-full md:w-1/2 flex flex-col">
@@ -23,7 +49,7 @@ export default function PostDetails() {
                   <div className="w-8 h-8 rounded-full overflow-hidden">
                     <div className="w-full h-full rounded-full overflow-hidden bg-white">
                       <img
-                        src={Authorimage}
+                        src={post?.author?.profilePic}
                         alt="User avatar"
                         className="w-full h-full object-cover rounded-full"
                       />
@@ -32,7 +58,7 @@ export default function PostDetails() {
                   <div className="ml-2">
                     <div className="flex items-center">
                       <span className="font-semibold text-sm">
-                        Learn with Sumit
+                        {post?.author?.userName}
                       </span>
                     </div>
                     <div className="flex items-center">
@@ -46,12 +72,7 @@ export default function PostDetails() {
             </div>
 
             <div className="p-3">
-              <p className="text-sm ">
-                ডকুমেন্টেশন থেকে রিয়্যাক্ট ও নেক্সট জে.এস-এর মৌলিক ও আবশ্যিক
-                বিষয়সমূহ বুঝার পাশাপাশি এই কোর্সের প্রজেক্ট ভিত্তিক শেখানোর
-                পদ্ধতি আপনাকে একজন দক্ষ রিয়্যাক্ট ফ্রন্ট-এন্ড ডেভেলপার হয়ে উঠতে
-                সাহায্য করবে বলে আমাদের বিশ্বাস।
-              </p>
+              <p className="text-sm font-bold">{post.caption}</p>
             </div>
 
             <div className="comments-section flex-grow p-3 border-b">
@@ -239,45 +260,29 @@ export default function PostDetails() {
       <div className="mb-8 mx-auto max-w-5xl">
         <h2 className="text-sm text-gray-500 font-normal mb-4">
           More posts from{" "}
-          <span className="font-semibold text-black">Learn with Sumit</span>
+          <span className="font-semibold text-black">
+            {post?.author?.userName}
+          </span>
         </h2>
 
         <div className="grid grid-cols-3 gap-1">
-          <a href="./post-details.html">
-            <div className="relative">
-              <img src={Post2} alt="Grid image" className="w-full grid-image" />
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <Link to={`/post-details/${post._id}`}>
+                <div className="relative">
+                  <img
+                    src={post.image}
+                    alt="Grid image"
+                    className="w-full grid-image"
+                  />
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="text-gray-600 text-3xl font-bold text-center">
+              No Posts.
             </div>
-          </a>
-
-          <a href="./post-details.html">
-            <div className="relative">
-              <img src={Post3} alt="Grid image" className="w-full grid-image" />
-            </div>
-          </a>
-
-          <a href="./post-details.html">
-            <div className="relative">
-              <img src={Post4} alt="Grid image" className="w-full grid-image" />
-            </div>
-          </a>
-
-          <a href="./post-details.html">
-            <div className="relative">
-              <img src={Post5} alt="Grid image" className="w-full grid-image" />
-            </div>
-          </a>
-
-          <a href="./post-details.html">
-            <div className="relative">
-              <img src={Post6} alt="Grid image" className="w-full grid-image" />
-            </div>
-          </a>
-
-          <a href="./post-details.html">
-            <div className="relative">
-              <img src={Post7} alt="Grid image" className="w-full grid-image" />
-            </div>
-          </a>
+          )}
         </div>
       </div>
     </div>

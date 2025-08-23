@@ -1,7 +1,61 @@
-import User1 from "../../assets/users/user-1.png"
+import { useForm } from "react-hook-form";
+import User1 from "../../assets/users/user-1.png";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../Context/authcontext";
+import useGetSingleUser from "../../Hooks/useGetSingleUser";
+import toast from "react-hot-toast";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { useNavigate } from "react-router-dom";
+import { imageUpload } from "../../api/utils";
 export default function CreatePost() {
+  const { user: authUser } = useContext(AuthContext);
+  const { user: dbUser } = useGetSingleUser(authUser?.email);
+  const axiosPublic = useAxiosPublic();
+  const navigate = useNavigate();
+  const [preview, setPreview] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm();
+
+  const onSubmit = async (data) => {
+    const { caption, image } = data;
+    if (
+      !caption ||
+      caption.trim().length === 0 ||
+      !image ||
+      image.length === 0
+    ) {
+      return toast.error("You have to fill all fields");
+    }
+    let photo = preview;
+
+    if (image && image[0]) {
+      photo = await imageUpload(image[0]);
+    }
+    const postData = {
+      author: dbUser,
+      caption,
+      image: photo,
+      likes: [],
+      comments: [],
+      createdAt: Date.now(),
+    };
+    try {
+      const response = await axiosPublic.post("/posts", postData);
+      if (response.data.insertedId) {
+        toast.success("Posted Successfully");
+        navigate("/");
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error(err.message);
+    }
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <header class="h-14 border-b flex items-center justify-between px-4">
         <button class="p-1">
           <svg
@@ -20,17 +74,38 @@ export default function CreatePost() {
           </svg>
         </button>
         <h1 class="text-base font-semibold">Create new post</h1>
-        <button class="text-blue-500 font-semibold">Post</button>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          class="text-blue-500  cursor-pointer font-semibold"
+        >
+          {isSubmitting ? "Posting" : "Post"}
+        </button>
       </header>
 
       <div class="upload-container flex flex-col md:flex-row">
         <div class="w-full md:w-1/2 bg-gray-100 flex items-center justify-center relative">
-          <img src="" alt="Upload preview" class="image-preview" />
+          <img src={preview} alt="Upload preview" class="image-preview" />
 
           <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <button class="bg-black bg-opacity-75 text-white text-sm py-1 px-3 rounded-md">
-              Click photo to tag people
-            </button>
+            <input
+              {...register("image", { required: "Image is required" })}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setPreview(URL.createObjectURL(file));
+                }
+              }}
+              placeholder="Click to upload photo"
+              class="bg-black bg-opacity-75 text-white text-sm py-1 px-3 rounded-md"
+            />
+            {errors?.image && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors?.email?.message}
+              </p>
+            )}
           </div>
         </div>
 
@@ -38,21 +113,27 @@ export default function CreatePost() {
           <div class="flex items-center p-4 border-b">
             <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-300">
               <img
-                src={User1}
+                src={dbUser?.profilePic}
                 alt="User avatar"
                 class="w-full h-full object-cover"
               />
             </div>
-            <span class="ml-3 font-semibold text-sm">Saad Hasan</span>
+            <span class="ml-3 font-semibold text-sm">{dbUser?.userName}</span>
           </div>
 
           <div class="p-4 border-b flex-grow">
             <div class="mb-2">
               <p class="font-medium text-base mb-2">Caption Section</p>
               <textarea
+                {...register("caption", { required: "Caption is required" })}
                 class="w-full caption-input border-0 outline-none text-sm"
                 placeholder="Write a caption..."
               ></textarea>
+              {errors?.caption && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors?.email?.message}
+                </p>
+              )}
             </div>
 
             <div class="flex justify-between items-center">
@@ -157,6 +238,6 @@ export default function CreatePost() {
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
