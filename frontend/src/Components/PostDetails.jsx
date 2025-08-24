@@ -44,7 +44,7 @@ export default function PostDetails() {
 
           <div className="w-full md:w-1/2 flex flex-col">
             <div className="flex items-center justify-between p-3 border-b">
-              <a href="./profile.html">
+              <Link to={`/profile/${post?.author?.email}`}>
                 <div className="flex items-center">
                   <div className="w-8 h-8 rounded-full overflow-hidden">
                     <div className="w-full h-full rounded-full overflow-hidden bg-white">
@@ -68,7 +68,7 @@ export default function PostDetails() {
                     </div>
                   </div>
                 </div>
-              </a>
+              </Link>
             </div>
 
             <div className="p-3">

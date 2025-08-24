@@ -5,21 +5,24 @@ import PostImage from "../assets/articles/post-1.jpg";
 import { Link } from "react-router-dom";
 export default function Post({ post }) {
   return (
-    <article className="border-b pb-4 mb-4 max-w-[560px] mx-auto border rounded-md">
+    <article className="border-b  pb-4 mb-4 w-[380px] lg:max-w-[560px] mx-auto border rounded-md">
       <div className="flex items-center p-3">
         <Link
-          to={"/profile"}
+          to={`/profile/${post?.author?.email}`}
           className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs"
         >
           <img
-            src={post.author.profilePic}
+            src={post?.author?.profilePic}
             alt="User avatar"
             className="w-full h-full object-cover"
           />
         </Link>
         <div className="ml-2">
-          <Link to={"/profile"} className="font-semibold text-sm">
-            {post.author.userName}
+          <Link
+            to={`/profile/${post?.author?.email}`}
+            className="font-semibold text-sm"
+          >
+            {post?.author?.userName}
           </Link>
           <span className="text-gray-500 text-xs"> • 6m</span>
         </div>

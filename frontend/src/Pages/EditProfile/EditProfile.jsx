@@ -1,4 +1,5 @@
-import { useContext, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useContext, useEffect, useState } from "react";
 import User1 from "../../assets/users/user-1.png";
 import { AuthContext } from "../../Context/authcontext";
 import useGetSingleUser from "../../Hooks/useGetSingleUser";
@@ -6,9 +7,21 @@ import { useForm } from "react-hook-form";
 import { imageUpload } from "../../api/utils";
 import toast from "react-hot-toast";
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { useNavigate, useParams } from "react-router-dom";
 export default function EditProfile() {
   const { user: authUser, updateUserProfile } = useContext(AuthContext);
+  const { email } = useParams();
   const { user: dbUser } = useGetSingleUser(authUser?.email);
+
+  const navigate = useNavigate();
+
+  const itsMe = authUser?.email === email;
+
+  useEffect(() => {
+    if (!itsMe) {
+      navigate("/");
+    }
+  }, [itsMe]);
 
   const [preview, setPreview] = useState(dbUser?.profilePic || "");
 

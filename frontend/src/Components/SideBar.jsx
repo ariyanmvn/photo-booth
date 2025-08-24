@@ -90,7 +90,10 @@ export default function SideBar() {
         </li>
 
         <li>
-          <Link to={"/profile"} className="flex flex-row items-center gap-2">
+          <Link
+            to={`/profile/${dbUser?.email}`}
+            className="flex flex-row items-center gap-2"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -113,7 +116,7 @@ export default function SideBar() {
 
       {authUser ? (
         <div className="flex  justify-between items-center">
-          <Link to={"/profile"}>
+          <Link to={`/profile/${dbUser?.email}`}>
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-300">
                 <img

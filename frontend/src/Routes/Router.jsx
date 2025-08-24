@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/profile",
+        path: "/profile/:email",
         element: (
           <PrivateRoute>
             <Profile />
@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/edit-profile",
+        path: "/edit-profile/:email",
         element: (
           <PrivateRoute>
             <EditProfile />
