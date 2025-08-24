@@ -110,7 +110,7 @@ export default function EditProfile() {
           type="text"
           class="form-input mb-2"
           placeholder="enter your website link"
-          defaultValue={dbUser?.bio || ""}
+          defaultValue={dbUser?.website || ""}
         />
         <p class="text-gray-500 text-xs">
           Editing your links is only available on mobile. Visit the PhotoBooth
@@ -191,7 +191,7 @@ export default function EditProfile() {
       </div>
 
       <div class="flex justify-end">
-        <button class="bg-blue-100 text-blue-500 px-6 py-2 rounded-md text-sm font-medium hover:bg-blue-200 transition">
+        <button class="bg-blue-100 cursor-pointer text-blue-500 px-6 py-2 rounded-md text-sm font-medium hover:bg-blue-200 transition">
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>

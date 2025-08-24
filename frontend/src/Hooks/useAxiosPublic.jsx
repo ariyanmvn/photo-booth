@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/",
+  baseURL: "https://backend-neon-ten-94.vercel.app/",
 });
 
 const useAxiosPublic = () => {
